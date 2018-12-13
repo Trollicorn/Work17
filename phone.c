@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <sys/shm.h>
+#include <fcntl.h>
 
 #define KEY 2018
 
@@ -19,10 +21,23 @@ int main(int argc, char * argv[]){
 		return -1;
 	}
 	
-	if (!strcmp(argv[0],"-c")){
+	if (!strcmp(argv[0],"-c")){ //creation
 		semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0666);
-		
+		shmget(KEY, 200, IPC_CREAT | IPC_EXCL | 0666);
+		open("story.txt", O_CREAT | O_EXCL);
 	}
-
-
+	if (!strcmp(argv[0],"-r")){ //destruction
+		semid = semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0666); 
+		semctl(semid, 0, IPC_RMID);
+		shmid = shmget(KEY, 200, IPC_CREAT | IPC_EXCL | 0666);
+		shmctl(shmid, IPC_RMID, NULL);
+		fd = open("story.txt", O_RDONLY |  O_CREAT | O_EXCL);
+		char s[4000];
+		read(fd,s,sizeof(s));
+		printf("%s",s);
+		unlink("story.txt");		
+	}
+	if (!strcmp(argv[0], "-v"){
+		v
+	}
 }
