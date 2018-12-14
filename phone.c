@@ -10,6 +10,14 @@
 
 #define KEY 2018
 
+
+union semun{
+	int val;
+	struct semid_ds *buf;     //Used for SETVAL
+	unsigned short *array;   //Used for IPC_STAT and IPC_SET
+	struct seminfo *__buf;   //Used for SETALL
+};
+
 int main(int argc, char * argv[]){
 
 	if (argc != 2){
@@ -22,9 +30,12 @@ int main(int argc, char * argv[]){
 	}
 	
 	if (!strcmp(argv[0],"-c")){ //creation
-		semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0666);
+		int semid = semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0666);
 		shmget(KEY, 200, IPC_CREAT | IPC_EXCL | 0666);
-		int fd = open("story.txt", O_CREAT | O_EXCL);
+		int fd = open("story.txt", O_WRONLY | O_CREAT | O_EXCL | O_TRUNC);
+		union semun change;
+		change.val = 1;
+		semctl(semid, 0, SETVAL, change); 
 		close(fd);
 	}
 	if (!strcmp(argv[0],"-r")){ //destruction
