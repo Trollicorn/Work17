@@ -24,8 +24,15 @@ int write() {
 
 	semop(semd, sembuf, 1);
 
+	int shmid = shmget(KEY, 0, 0);
+	int shmem = shmat(shmid, 0, 0);
+
 	int fd = open("story.txt", O_APPEND);
-	//read last line
+	lseek(fd, -1 * shmem,SEEK_END);
+	char last[500];
+	read(fd, last, 500);
+	
+	printf("Current last line: %s", last);
 
 	char input[500];
 	printf("Enter new story line: ");
@@ -36,10 +43,7 @@ int write() {
 
 	close(fd);
 
-	int shmid = shmget(KEY, 0, 0);
-	int shmem = shmat(shmid, 0, 0);
 	shmem = bytes;
-	shmdt(
+	shmdt(&shmem);
 	
-
 }
