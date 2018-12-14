@@ -22,6 +22,8 @@ int main() {
 
 //	while(semctl(semd, 0, GETVAL) == 0);
 
+	printf("1");
+
 	semop(semd, &change, 1);
 
 	int shmid = shmget(KEY, 200, IPC_CREAT | IPC_EXCL | 0666);
@@ -29,6 +31,8 @@ int main() {
 	char * data;
 //	data = smhat(shmid, &shmem, 0);
 	data = shmat(shmid, (void *) 0, 0);
+
+	printf("2");
 
 //	int fd = open("story.txt", O_APPEND);
 	int fd = open("story.txt", O_WRONLY | O_CREAT | O_EXCL | O_APPEND); 

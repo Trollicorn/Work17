@@ -7,6 +7,7 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #define KEY 2018
 
@@ -31,7 +32,9 @@ int main(int argc, char * argv[]){
 	
 	if (!strcmp(argv[0],"-c")){ //creation
 		int semid = semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0666);
-		shmget(KEY, 200, IPC_CREAT | IPC_EXCL | 0666);
+		if (semid == -1){printf("%s\n",strerror(errno));return 1;}
+		int shmid = shmget(KEY, 200, IPC_CREAT | IPC_EXCL | 0666);
+		if (shmid == -1){printf("%s\n",strerror(errno));return 1;}
 		int fd = open("story.txt", O_WRONLY | O_CREAT | O_EXCL | O_TRUNC);
 		union semun change;
 		change.val = 1;
