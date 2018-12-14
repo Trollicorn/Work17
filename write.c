@@ -10,7 +10,7 @@
 
 #define KEY 2018
 
-int write() {
+int main() {
 
 	int semd;
 	semd = semget(KEY, 0, 0);
