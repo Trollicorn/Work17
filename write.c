@@ -22,10 +22,11 @@ int main() {
 
 	while(semctl(semd, 0, GETVAL) == 0);
 
-	semop(semd, sembuf, 1);
+	semop(semd, &change, 1);
 
 	int shmid = shmget(KEY, 0, 0);
-	int shmem = shmat(shmid, 0, 0);
+	int shmem;
+	shmat(shmid, &shmem, 0);
 
 	int fd = open("story.txt", O_APPEND);
 	lseek(fd, -1 * shmem,SEEK_END);
