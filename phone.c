@@ -29,35 +29,42 @@ int main(int argc, char * argv[]){
 			"'-v': view the thing\n");
 		return -1;
 	}
-	
+
+	int semid;
+	int shmid;
+	int fd;
+	union semun change;
+	struct sembuf arrow;
+	arrow.sem_num = 0;
+	arrow.sem_flg = SEM_UNDO;
+
 	if (!strcmp(argv[1],"-c")){ //creation
-		int semid = semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0666);
+		semid = semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0666);
 //		if (semid == -1){printf("semerror: %s\n",strerror(errno));return -1;}
 		printf("semid: %d\n",semid);
-		int shmid = shmget(KEY, 200, IPC_CREAT | IPC_EXCL | 0666);
+		shmid = shmget(KEY, 200, IPC_CREAT | IPC_EXCL | 0666);
 //		if (shmid == -1){printf("shmerror: %s\n",strerror(errno));return -1;}
 		printf("semid: %d\n",semid);
-		int fd = open("story.txt", O_WRONLY | O_CREAT | O_EXCL | O_TRUNC | 0666);
+		fd = open("story.txt", O_CREAT | O_TRUNC, 0666);
 //		if (fd == -1){printf("fderror: %s\n",strerror(errno));return -1;}
 		printf("fd: %d\n",fd);
-		union semun change;
 		change.val = 1;
 		semctl(semid, 0, SETVAL, change); 
 		close(fd);
 	}
 	else if (!strcmp(argv[1],"-r")){ //destruction
-		int semid = semget(KEY, 1, 0); 
+		semid = semget(KEY, 1, 0); 
 		semctl(semid, 0, IPC_RMID);
-		int shmid = shmget(KEY, 200, 0);
+		shmid = shmget(KEY, 200, 0);
 		shmctl(shmid, IPC_RMID, NULL);
-		int fd = open("story.txt", O_RDONLY);
+		fd = open("story.txt", O_RDONLY);
 		char s[4000];
 		read(fd,s,sizeof(s));
 		printf("%s",s);
 		unlink("story.txt");		
 	}
 	else if (!strcmp(argv[1], "-v")){
-		int fd = open("story.txt", O_RDONLY);
+		fd = open("story.txt", O_RDONLY);
 		char s[4000];
 		read(fd,s,sizeof(s));
 		printf("%s",s);
